@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+/* ── TREELOOK COLOUR SYSTEM v1.0 ── */
+:root {
+
+  /* PRIMARY — Forest Green */
+  --green-50:  #F0FAF4;
+  --green-100: #D6F2E1;
+  --green-200: #A8E2C0;
+  --green-300: #6FCC97;
+  --green-400: #3BB36E;
+  --green-500: #1E9952;
+  --green-600: #167A40;
+  --green-700: #105C30;
+  --green-800: #0A3E20;
+  --green-900: #052010;
+
+  /* SECONDARY — Royal Purple */
+  --purple-50:  #F7F0FC;
+  --purple-100: #ECD9F8;
+  --purple-200: #D4AEF0;
+  --purple-300: #B87DE4;
+  --purple-400: #9B4DD4;
+  --purple-500: #7B2D8B;
+  --purple-600: #612270;
+  --purple-700: #481855;
+  --purple-800: #300F3A;
+  --purple-900: #18071D;
+
+  /* ACCENT — Terracotta Earth */
+  --earth-50:  #FDF5F0;
+  --earth-100: #FAE4D6;
+  --earth-200: #F4C4A8;
+  --earth-300: #EC9E72;
+  --earth-400: #E07A42;
+  --earth-500: #C85E24;
+  --earth-600: #A04A1C;
+  --earth-700: #7A3814;
+  --earth-800: #52260D;
+  --earth-900: #2A1306;
+
+  /* NEUTRALS — Warm tinted */
+  --neutral-0:   #FFFFFF;
+  --neutral-50:  #FAFAF8;
+  --neutral-100: #F4F3F0;
+  --neutral-200: #E8E6E0;
+  --neutral-300: #D4D0C8;
+  --neutral-400: #B0AA9E;
+  --neutral-500: #8C8678;
+  --neutral-600: #6A6458;
+  --neutral-700: #4A4540;
+  --neutral-800: #2E2A26;
+  --neutral-900: #181612;
+
+  /* SEMANTIC */
+  --success: #1E9952;
+  --warning: #D4840A;
+  --error:   #C83232;
+  --info:    #1E6AB8;
+
+  /* ── NAMED TOKENS — Light Mode ── */
+
+  /* Backgrounds & Surfaces */
+  --bg:         #FAFAF8;
+  --surface:    #FFFFFF;
+  --surface-2:  #F4F3F0;
+  --border:     #E8E6E0;
+
+  /* Text */
+  --text:       #181612;
+  --text-mid:   #4A4540;
+  --text-light: #8C8678;
+
+  /* Brand shortcuts */
+  --primary:        var(--green-500);
+  --primary-light:  var(--green-100);
+  --primary-dark:   var(--green-700);
+  --secondary:      var(--purple-500);
+  --secondary-light: var(--purple-100);
+  --secondary-dark:  var(--purple-800);
+  --accent:         var(--earth-500);
+  --accent-light:   var(--earth-100);
+
+  /* Legacy aliases — keeps existing components working */
+  --white:        #FFFFFF;
+  --purple:       var(--purple-500);
+  --purple-dark:  var(--purple-800);
+  --purple-mid:   var(--purple-400);
+  --purple-light: var(--purple-100);
+  --purple-pale:  var(--purple-50);
+  --green:        var(--green-500);
+  --green-light:  var(--green-100);
+  --amber:        var(--earth-400);
+  --red:          var(--error);
+  --blue:         var(--info);
+
+  /* Typography */
+  --font-serif: 'DM Serif Display', serif;
+  --font-sans:  'DM Sans', sans-serif;
+
+  /* Layout */
+  --nav-h:          64px;
+  --sidebar-left:   260px;
+  --sidebar-right:  280px;
+  --max-width:      1280px;
+  --radius-sm:      8px;
+  --radius-md:      12px;
+  --radius-lg:      16px;
+  --radius-xl:      20px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 4px rgba(24,22,18,0.06);
+  --shadow-md: 0 4px 16px rgba(24,22,18,0.08);
+  --shadow-lg: 0 8px 32px rgba(24,22,18,0.10);
+  --shadow-purple: 0 4px 16px rgba(123,45,139,0.18);
+  --shadow-green:  0 4px 16px rgba(30,153,82,0.18);
+}
+
+/* ── RESET ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; }
+img { max-width: 100%; display: block; }
+
+/* ── LAYOUT HELPERS ── */
+.page-wrapper {
+  margin-top: var(--nav-h);
+  min-height: calc(100vh - var(--nav-h));
+}
+
+/* ── SHARED CARD ── */
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── SHARED BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  border: 1.5px solid transparent;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  box-shadow: var(--shadow-green);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+  background: var(--purple-pale);
+}
+
+.btn-ghost {
+  background: var(--secondary-light);
+  color: var(--secondary);
+  border-color: var(--secondary-light);
+}
+.btn-ghost:hover {
+  background: var(--secondary);
+  color: white;
+  box-shadow: var(--shadow-purple);
+}
+
+.btn-earth {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent-light);
+}
+.btn-earth:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* ── SHARED TAGS ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag-green  { background: var(--green-100);  color: var(--green-600); }
+.tag-purple { background: var(--purple-100); color: var(--purple-600); }
+.tag-earth  { background: var(--earth-100);  color: var(--earth-600); }
+.tag-grey   { background: var(--neutral-100); color: var(--neutral-600); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--neutral-200); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neutral-300); }

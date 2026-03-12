@@ -1,0 +1,218 @@
+/* Nav uses same grid as Dashboard — 260px | 1fr | 280px */
+
+.topnavOuter {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--white);
+  border-bottom: 1.5px solid var(--border);
+  box-shadow: 0 2px 16px rgba(30,153,82,0.06);
+  z-index: 200;
+}
+
+.topnav {
+  max-width: 1280px;
+  margin: 0 auto;
+  height: var(--nav-h);
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  align-items: center;
+  padding: 0 16px;
+}
+
+/* ── LEFT: Logo + Search ── */
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoImg {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 10px;
+  transition: transform 0.2s;
+}
+.logoImg:hover { transform: scale(1.06); }
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 16px;
+  width: 180px;
+  transition: border-color 0.2s, width 0.3s;
+}
+.searchBar:focus-within {
+  border-color: var(--green-500);
+  width: 210px;
+}
+
+.searchIcon {
+  font-size: 14px;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.searchBar input {
+  border: none;
+  background: none;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text);
+  width: 100%;
+}
+.searchBar input::placeholder { color: var(--text-light); }
+
+/* ── CENTER: Nav items ── */
+.mainNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100%;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  height: 100%;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: background 0.18s;
+  text-decoration: none;
+  color: var(--text-mid);
+  position: relative;
+  border-radius: 0;
+}
+
+.navItem:hover { background: var(--purple-pale); }
+
+/* Active — longer green underline bar */
+.navItem.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 3px;
+  background: var(--green-500);
+  border-radius: 2px 2px 0 0;
+}
+
+/* ── ICON WRAPPER ── */
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+/* ── INACTIVE icon — stroke SVG, greyed out ── */
+.navIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: invert(60%) sepia(0%) saturate(0%) brightness(80%);
+  transition: filter 0.18s, transform 0.18s;
+}
+
+.navItem:hover .navIcon {
+  filter: invert(30%) sepia(0%) saturate(0%) brightness(60%);
+  transform: scale(1.08);
+}
+
+/* ── ACTIVE icon — filled SVG, Treelook green #1E9952 ── */
+.navIconActive {
+  filter: invert(44%) sepia(73%) saturate(523%) hue-rotate(103deg) brightness(92%) contrast(92%) !important;
+  transform: scale(1.05);
+}
+
+/* ── LABELS ── */
+.navLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-light);
+  white-space: nowrap;
+  transition: color 0.18s, opacity 0.18s;
+  /* Visible on inactive */
+  opacity: 1;
+  height: auto;
+}
+
+.navItem:hover .navLabel {
+  color: var(--text-mid);
+}
+
+/* Hide label when active — icon + underline only */
+.navLabelActive {
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ── BADGE ── */
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: var(--error);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid white;
+}
+
+/* ── RIGHT: Avatar ── */
+.navRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  border: 2.5px solid var(--purple-light);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.userAvatar:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(123,45,139,0.3);
+}
