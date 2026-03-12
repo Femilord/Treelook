@@ -5,7 +5,7 @@ const router = Router();
 
 router.post("/", async (req, res) => {
     try {
-        const { firstName, lastName, gender, birthDate } = req.body;
+        const { firstName, lastName, gender, relationship, birthDate } = req.body;
 
         if (!firstName || typeof firstName !== "string") {
             return res.status(400).json({ error: "firstName is required" });
@@ -16,6 +16,7 @@ router.post("/", async (req, res) => {
                 firstName,
                 lastName: lastName || null,
                 gender: gender || null,
+                relationship: relationship || null,
                 birthDate: birthDate ? new Date(birthDate) : null,
             },
         });
