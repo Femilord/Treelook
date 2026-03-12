@@ -1,23 +1,36 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import styles from './TopNav.module.css'
 
 const navItems = [
-  { path: '/dashboard',     icon: '/icons/home.svg',         iconActive: '/icons/home-active.svg',         label: 'Home' },
-  { path: '/family',        icon: '/icons/family.svg',       iconActive: '/icons/family-active.svg',       label: 'My Family' },
-  { path: '/tree',          icon: '/icons/treemap.svg',      iconActive: '/icons/treemap-active.svg',      label: 'Tree Map' },
-  { path: '/events',        icon: '/icons/events.svg',       iconActive: '/icons/events-active.svg',       label: 'Events',        badge: 3 },
-  { path: '/messages',      icon: '/icons/messages.svg',     iconActive: '/icons/messages-active.svg',     label: 'Messages',      badge: 5 },
+  { path: '/dashboard', icon: '/icons/home.svg', iconActive: '/icons/home-active.svg', label: 'Home' },
+  { path: '/family', icon: '/icons/family.svg', iconActive: '/icons/family-active.svg', label: 'My Family' },
+  { path: '/tree', icon: '/icons/treemap.svg', iconActive: '/icons/treemap-active.svg', label: 'Tree Map' },
+  { path: '/events', icon: '/icons/events.svg', iconActive: '/icons/events-active.svg', label: 'Events', badge: 3 },
+  { path: '/messages', icon: '/icons/messages.svg', iconActive: '/icons/messages-active.svg', label: 'Messages', badge: 5 },
   { path: '/notifications', icon: '/icons/notification.svg', iconActive: '/icons/notification-active.svg', label: 'Notifications', badge: 2 },
 ]
 
 export default function TopNav() {
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const handleLogout = () => {
+    localStorage.removeItem("treelook_token")
+    localStorage.removeItem("treelook_user")
+    navigate("/login")
+  }
+
+  const hideTopNav =
+    location.pathname === "/login" || location.pathname === "/register"
+
+  if (hideTopNav) {
+    return null
+  }
 
   return (
     <header className={styles.topnavOuter}>
       <div className={styles.topnav}>
 
-        {/* LEFT — Logo + Search */}
         <div className={styles.navLeft}>
           <a className={styles.logo} href="/dashboard">
             <img
@@ -32,7 +45,6 @@ export default function TopNav() {
           </div>
         </div>
 
-        {/* CENTER — Nav items */}
         <div className={styles.mainNav}>
           {navItems.map((item) => (
             <NavLink
@@ -64,7 +76,6 @@ export default function TopNav() {
           ))}
         </div>
 
-        {/* RIGHT — User avatar */}
         <div className={styles.navRight}>
           <div
             className={styles.userAvatar}
@@ -73,6 +84,10 @@ export default function TopNav() {
           >
             FO
           </div>
+
+          <button type="button" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
 
       </div>

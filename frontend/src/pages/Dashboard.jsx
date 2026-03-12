@@ -57,6 +57,7 @@ const stories = []
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  
 
   return (
     <div className="page-wrapper">
@@ -70,12 +71,17 @@ export default function Dashboard() {
             <div className={styles.quickActions}>
               <div className={styles.sectionTitle}>Quick Actions</div>
               {[
-                { icon: '➕', label: 'Add a Family Member', color: 'green' },
+                { icon: '➕', label: 'Add a Family Member', color: 'green', path: '/add-family-member' },
                 { icon: '📨', label: 'Invite a Family Member', color: 'purple' },
                 { icon: '💍', label: 'New Family Marriage', color: 'amber' },
                 { icon: '📸', label: 'Create a Memory', color: 'red' },
               ].map(a => (
-                <button key={a.label} className={styles.qaBtn}>
+                <button
+                  key={a.label}
+                  className={styles.qaBtn}
+                  type="button"
+                  onClick={() => a.path && navigate(a.path)}
+                >
                   <div className={`${styles.qaIcon} ${styles[a.color]}`}>{a.icon}</div>
                   {a.label}
                 </button>
