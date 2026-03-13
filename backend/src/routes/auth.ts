@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { requireAuth, AuthRequest } from "../middleware/auth";
 
 const router = Router();
 
@@ -78,6 +79,36 @@ router.post("/login", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Login failed" });
+    }
+});
+
+
+router.get("/me", requireAuth, async (req: AuthRequest, res) => {
+    try {
+        const userId = req.user?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                createdAt: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        return res.json(user);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to fetch current user" });
     }
 });
 

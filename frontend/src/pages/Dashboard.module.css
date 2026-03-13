@@ -157,12 +157,42 @@
 .postDivider { height: 1px; background: var(--border); margin: 0 16px; }
 .postActions { display: flex; }
 .postActionBtn {
-  flex: 1; padding: 10px;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  font-size: 13px; font-weight: 500; color: var(--text-mid);
-  border-radius: 8px; cursor: pointer; transition: background 0.15s;
+  flex: 1;
+  padding: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-mid);
+
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  /* ADD THESE */
+  border: none;
+  background: transparent;
+  outline: none;
 }
-.postActionBtn:hover { background: var(--bg); color: var(--purple); }
+
+/* .postActionBtn:hover { background: var(--bg); color: var(--purple); } */
+
+.postActionBtn:hover,
+button.postActionBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.postActionBtn {
+  border: none;
+  background: transparent;
+  outline: none;
+  appearance: none;
+}
+
+.postActionBtn:focus { outline: none; }
 
 /* Suggestions */
 .sugTitle {

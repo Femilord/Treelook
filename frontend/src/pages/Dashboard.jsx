@@ -1,6 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './Dashboard.module.css'
+import { useAuth } from '../context/AuthContext'
+import { getPosts, createPost } from '../lib/posts'
+import { toggleReaction } from '../lib/reactions'
 
 const linkedMembers = [
   { id: 3, name: 'James Westin', rel: 'Your Son', initials: 'JW', status: 'live', color: '#7B2D8B' },
@@ -22,51 +25,67 @@ const events = [
   { day: '02', month: 'Apr', name: "William Jr.'s Birthday", who: 'Your Grandson · Turning 38', type: 'birthday' },
 ]
 
-const posts = [
-  {
-    id: 1,
-    authorInitials: 'NW',
-    authorColor: '#6B7A99',
-    author: 'Nicolas Westin Jr.',
-    rel: 'Your Brother',
-    time: '2 hours ago',
-    text: "Dad would have turned 89 today. Sharing this photo from the last family reunion we had together in 2022. He always said — the tree grows as long as the roots hold. 🌳❤️",
-    reactions: '❤️🙏😢',
-    reactionCount: 24,
-    comments: 8,
-    hasImage: true,
-  },
-  {
-    id: 2,
-    authorInitials: 'JW',
-    authorColor: '#2A9D5C',
-    author: 'James Westin',
-    rel: 'Your Son',
-    time: 'Yesterday',
-    text: "Gracie and I are thrilled to announce — Baby Westin is on the way! 🎉 Adding a new branch to the tree. Gran Maria, this one's for you! 👶🌿",
-    reactions: '🎉❤️😍',
-    reactionCount: 41,
-    comments: 15,
-    hasImage: false,
-  },
-]
-
-// Stories — just the Add Story button for now
-// Family member stories will populate here once the feature is live
 const stories = []
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  
+  const { user } = useAuth()
+
+  const [posts, setPosts] = useState([])
+  const [postContent, setPostContent] = useState('')
+  const [posting, setPosting] = useState(false)
+
+  const initials = user?.fullName
+    ? user.fullName
+      .split(' ')
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+    : 'FO'
+
+  const loadPosts = async () => {
+    try {
+      const data = await getPosts()
+      setPosts(data)
+    } catch (error) {
+      console.error('Failed to load posts', error)
+    }
+  }
+
+  useEffect(() => {
+    loadPosts()
+  }, [])
+
+  const handleCreatePost = async () => {
+    if (!postContent.trim()) return
+
+    try {
+      setPosting(true)
+      await createPost(postContent)
+      setPostContent('')
+      await loadPosts()
+    } catch (error) {
+      console.error('Failed to create post', error)
+    } finally {
+      setPosting(false)
+    }
+  }
+
+  const handleToggleReaction = async (postId) => {
+    try {
+      await toggleReaction(postId)
+      await loadPosts()
+    } catch (error) {
+      console.error('Failed to toggle reaction', error)
+    }
+  }
 
   return (
     <div className="page-wrapper">
       <div className={styles.layout}>
 
-        {/* LEFT SIDEBAR */}
         <aside className={styles.sidebarLeft}>
-
-          {/* Quick Actions */}
           <div className="card">
             <div className={styles.quickActions}>
               <div className={styles.sectionTitle}>Quick Actions</div>
@@ -89,16 +108,23 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Newly Linked */}
           <div className="card">
             <div className={styles.linkedSection}>
               <div className={styles.sectionTitle}>Newly Linked to Your Tree</div>
               <div className={styles.linkedList}>
                 {linkedMembers.map(m => (
-                  <div key={m.id} className={styles.linkedItem} onClick={() => navigate(`/profile/${m.id}`)}>
+                  <div
+                    key={m.id}
+                    className={styles.linkedItem}
+                    onClick={() => navigate(`/profile/${m.id}`)}
+                  >
                     <div
                       className={`${styles.linkedAvatar} ${m.status === 'live' ? styles.linkedLive : styles.linkedPending}`}
-                      style={{ background: m.status === 'live' ? `linear-gradient(135deg, ${m.color}, ${m.color}99)` : '#f0f0f5' }}
+                      style={{
+                        background: m.status === 'live'
+                          ? `linear-gradient(135deg, ${m.color}, ${m.color}99)`
+                          : '#f0f0f5'
+                      }}
                     >
                       {m.status === 'live' ? m.initials : '👤'}
                     </div>
@@ -114,26 +140,24 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-
         </aside>
 
-        {/* CENTER FEED */}
         <main className={styles.centerFeed}>
-
-          {/* ── STORIES BAR ── */}
           <div className={`card ${styles.storiesCard}`}>
             <div className={styles.storiesScroll}>
-
-              {/* Add Your Story — always first */}
-              <div className={styles.storyItem}>
+              <div
+                className={styles.storyItem}
+                onClick={() => navigate('/profile/1')}
+                title="Go to profile"
+                style={{ cursor: 'pointer' }}
+              >
                 <div className={styles.addStoryBtn}>
-                  <div className={styles.addStoryAvatar}>FO</div>
+                  <div className={styles.addStoryAvatar}>{initials}</div>
                   <div className={styles.addStoryPlus}>+</div>
                 </div>
                 <span className={styles.storyName}>Add Story</span>
               </div>
 
-              {/* Family member stories render here when available */}
               {stories.map(s => (
                 <div key={s.id} className={styles.storyItem}>
                   <div
@@ -146,73 +170,126 @@ export default function Dashboard() {
                 </div>
               ))}
 
-              {/* Empty state hint when no stories yet */}
               {stories.length === 0 && (
                 <div className={styles.storiesEmpty}>
                   <span>Family stories will appear here</span>
                 </div>
               )}
-
             </div>
           </div>
 
-          {/* Compose */}
           <div className="card" style={{ padding: '16px' }}>
             <div className={styles.composeRow}>
-              <div className={styles.composeAvatar}>FO</div>
-              <div className={styles.composeInput}>
-                Share a memory, milestone or update with your family…
+              <div
+                className={styles.composeAvatar}
+                onClick={() => navigate('/profile/1')}
+                title="Go to profile"
+                style={{ cursor: 'pointer' }}
+              >
+                {initials}
               </div>
+
+              <textarea
+                value={postContent}
+                onChange={(e) => setPostContent(e.target.value)}
+                placeholder="Share a memory, milestone or update with your family…"
+                style={{
+                  flex: 1,
+                  minHeight: '80px',
+                  border: '1px solid #ddd',
+                  borderRadius: '12px',
+                  padding: '12px',
+                  resize: 'vertical',
+                  fontFamily: 'inherit',
+                  fontSize: '14px'
+                }}
+              />
             </div>
+
             <div className={styles.composeActions}>
-              <button className={`${styles.composeBtn} ${styles.video}`}>🎥 Video</button>
-              <button className={`${styles.composeBtn} ${styles.photo}`}>📷 Photo</button>
-              <button className={`${styles.composeBtn} ${styles.memory}`}>✨ Memory</button>
+              <button
+                className={`${styles.composeBtn} ${styles.memory}`}
+                type="button"
+                onClick={handleCreatePost}
+                disabled={posting}
+              >
+                {posting ? 'Posting...' : '📝 Post'}
+              </button>
+
+              <button className={`${styles.composeBtn} ${styles.video}`} type="button">
+                🎥 Video
+              </button>
+              <button className={`${styles.composeBtn} ${styles.photo}`} type="button">
+                📷 Photo
+              </button>
             </div>
           </div>
 
-          {/* Posts */}
-          {posts.map(post => (
-            <div key={post.id} className="card">
-              <div className={styles.postHeader}>
-                <div className={styles.postAvatar} style={{ background: `linear-gradient(135deg, ${post.authorColor}, ${post.authorColor}99)` }}>
-                  {post.authorInitials}
-                </div>
-                <div className={styles.postMeta}>
-                  <div className={styles.postAuthor}>
-                    {post.author} <span className={styles.postAction}>shared a post</span>
-                  </div>
-                  <div className={styles.postRel}>
-                    <span className={styles.relTag}>{post.rel}</span>
-                    <span className={styles.postTime}> · {post.time}</span>
-                  </div>
-                </div>
-                <div className={styles.postMenu}>⋯</div>
-              </div>
-              <div className={styles.postBody}>{post.text}</div>
-              {post.hasImage && (
-                <div className={styles.postImagePlaceholder}>🖼️</div>
-              )}
-              <div className={styles.postReactions}>
-                <span className={styles.reactionEmojis}>{post.reactions}</span>
-                <span className={styles.reactionCount}>{post.reactionCount} family members reacted</span>
-                <span className={styles.commentCount}>{post.comments} comments</span>
-              </div>
-              <div className={styles.postDivider} />
-              <div className={styles.postActions}>
-                <div className={styles.postActionBtn}>❤️ React</div>
-                <div className={styles.postActionBtn}>💬 Comment</div>
-                <div className={styles.postActionBtn}>📤 Share</div>
-              </div>
-            </div>
-          ))}
+          {posts.map(post => {
+            const postInitials = post.author?.fullName
+              ? post.author.fullName
+                .split(' ')
+                .map((part) => part[0])
+                .slice(0, 2)
+                .join('')
+                .toUpperCase()
+              : 'TL'
 
+            return (
+              <div key={post.id} className="card">
+                <div className={styles.postHeader}>
+                  <div
+                    className={styles.postAvatar}
+                    style={{ background: 'linear-gradient(135deg, #1E9952, #14703b)' }}
+                  >
+                    {postInitials}
+                  </div>
+
+                  <div className={styles.postMeta}>
+                    <div className={styles.postAuthor}>
+                      {post.author?.fullName || 'Treelook User'}{' '}
+                      <span className={styles.postAction}>shared a post</span>
+                    </div>
+                    <div className={styles.postRel}>
+                      <span className={styles.postTime}>
+                        {new Date(post.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className={styles.postMenu}>⋯</div>
+                </div>
+
+                <div className={styles.postBody}>{post.content}</div>
+
+                <div className={styles.postReactions}>
+                  <span className={styles.reactionCount}>
+                    {post.reactionCount || 0} family members reacted
+                  </span>
+                  
+                  <span className={styles.commentCount}>0 comments</span>
+                </div>
+
+                <div className={styles.postDivider} />
+
+                <div className={styles.postActions}>
+                  <button
+                    type="button"
+                    className={styles.postActionBtn}
+                    onClick={() => handleToggleReaction(post.id)}
+                  >
+                    ❤️ {post.hasReacted ? 'Reacted' : 'React'}
+                  </button>
+                  <button className={styles.postActionBtn}>💬 Comment</button>
+
+                  <button className={styles.postActionBtn}>📤 Share</button>
+                </div>
+              </div>
+            )
+          })}
         </main>
 
-        {/* RIGHT SIDEBAR */}
         <aside className={styles.sidebarRight}>
-
-          {/* Suggestions */}
           <div className="card" style={{ padding: '16px' }}>
             <div className={styles.sugTitle}>
               Family Suggestions
@@ -220,7 +297,10 @@ export default function Dashboard() {
             </div>
             {suggestions.map(s => (
               <div key={s.id} className={styles.sugItem}>
-                <div className={styles.sugAvatar} style={{ background: `linear-gradient(135deg, ${s.color}, ${s.color}99)` }}>
+                <div
+                  className={styles.sugAvatar}
+                  style={{ background: `linear-gradient(135deg, ${s.color}, ${s.color}99)` }}
+                >
                   {s.initials}
                 </div>
                 <div className={styles.sugInfo}>
@@ -234,7 +314,6 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Events */}
           <div className="card" style={{ padding: '16px' }}>
             <div className={styles.eventsTitle}>📅 Upcoming Events</div>
             {events.map((e, i) => (
@@ -254,7 +333,6 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Tree Stats */}
           <div className="card" style={{ padding: '16px' }}>
             <div className={styles.statsTitle}>🌳 Your Tree at a Glance</div>
             <div className={styles.statsGrid}>
@@ -271,7 +349,6 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-
         </aside>
 
       </div>

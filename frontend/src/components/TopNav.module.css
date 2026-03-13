@@ -216,3 +216,87 @@
   transform: scale(1.06);
   box-shadow: 0 4px 14px rgba(123,45,139,0.3);
 }
+
+
+
+
+
+.profileTrigger {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.navRight {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.profileDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-md);
+  padding: 10px;
+  z-index: 200;
+}
+
+.profileDropdownHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.profileDropdownAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.profileDropdownName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.profileDropdownEmail {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.dropdownItem {
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 12px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-mid);
+  transition: background 0.18s ease;
+}
+
+.dropdownItem:hover {
+  background: var(--neutral-50);
+}
+
+.logoutItem {
+  color: var(--error);
+}
