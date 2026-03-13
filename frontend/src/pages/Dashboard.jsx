@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './Dashboard.module.css'
 import { useAuth } from '../context/AuthContext'
 import { getPosts, createPost } from '../lib/posts'
 import { toggleReaction } from '../lib/reactions'
+import { createComment } from '../lib/comments'
+import PostComposer from '../components/PostComposer'
+import PostCard from '../components/PostCard'
 
 const linkedMembers = [
   { id: 3, name: 'James Westin', rel: 'Your Son', initials: 'JW', status: 'live', color: '#7B2D8B' },
@@ -32,8 +35,9 @@ export default function Dashboard() {
   const { user } = useAuth()
 
   const [posts, setPosts] = useState([])
-  const [postContent, setPostContent] = useState('')
-  const [posting, setPosting] = useState(false)
+  const [commentInputs, setCommentInputs] = useState({})
+
+  const commentRefs = useRef({})
 
   const initials = user?.fullName
     ? user.fullName
@@ -57,18 +61,12 @@ export default function Dashboard() {
     loadPosts()
   }, [])
 
-  const handleCreatePost = async () => {
-    if (!postContent.trim()) return
-
+  const handleCreatePost = async (content, imageUrl) => {
     try {
-      setPosting(true)
-      await createPost(postContent)
-      setPostContent('')
+      await createPost(content, imageUrl)
       await loadPosts()
     } catch (error) {
       console.error('Failed to create post', error)
-    } finally {
-      setPosting(false)
     }
   }
 
@@ -78,6 +76,36 @@ export default function Dashboard() {
       await loadPosts()
     } catch (error) {
       console.error('Failed to toggle reaction', error)
+    }
+  }
+
+  const handleCommentChange = (postId, value) => {
+    setCommentInputs((prev) => ({
+      ...prev,
+      [postId]: value,
+    }))
+  }
+
+  const focusCommentInput = (postId) => {
+    const input = commentRefs.current[postId]
+    if (input) input.focus()
+  }
+
+  const handleCreateComment = async (postId) => {
+    const content = commentInputs[postId]
+
+    if (!content || !content.trim()) return
+
+    try {
+      await createComment(postId, content)
+      setCommentInputs((prev) => ({
+        ...prev,
+        [postId]: '',
+      }))
+      await loadPosts()
+      focusCommentInput(postId)
+    } catch (error) {
+      console.error('Failed to create comment', error)
     }
   }
 
@@ -178,115 +206,24 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="card" style={{ padding: '16px' }}>
-            <div className={styles.composeRow}>
-              <div
-                className={styles.composeAvatar}
-                onClick={() => navigate('/profile/1')}
-                title="Go to profile"
-                style={{ cursor: 'pointer' }}
-              >
-                {initials}
-              </div>
+          <PostComposer
+            initials={initials}
+            onProfileClick={() => navigate('/profile/1')}
+            onCreatePost={handleCreatePost}
+          />
 
-              <textarea
-                value={postContent}
-                onChange={(e) => setPostContent(e.target.value)}
-                placeholder="Share a memory, milestone or update with your family…"
-                style={{
-                  flex: 1,
-                  minHeight: '80px',
-                  border: '1px solid #ddd',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  resize: 'vertical',
-                  fontFamily: 'inherit',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-
-            <div className={styles.composeActions}>
-              <button
-                className={`${styles.composeBtn} ${styles.memory}`}
-                type="button"
-                onClick={handleCreatePost}
-                disabled={posting}
-              >
-                {posting ? 'Posting...' : '📝 Post'}
-              </button>
-
-              <button className={`${styles.composeBtn} ${styles.video}`} type="button">
-                🎥 Video
-              </button>
-              <button className={`${styles.composeBtn} ${styles.photo}`} type="button">
-                📷 Photo
-              </button>
-            </div>
-          </div>
-
-          {posts.map(post => {
-            const postInitials = post.author?.fullName
-              ? post.author.fullName
-                .split(' ')
-                .map((part) => part[0])
-                .slice(0, 2)
-                .join('')
-                .toUpperCase()
-              : 'TL'
-
-            return (
-              <div key={post.id} className="card">
-                <div className={styles.postHeader}>
-                  <div
-                    className={styles.postAvatar}
-                    style={{ background: 'linear-gradient(135deg, #1E9952, #14703b)' }}
-                  >
-                    {postInitials}
-                  </div>
-
-                  <div className={styles.postMeta}>
-                    <div className={styles.postAuthor}>
-                      {post.author?.fullName || 'Treelook User'}{' '}
-                      <span className={styles.postAction}>shared a post</span>
-                    </div>
-                    <div className={styles.postRel}>
-                      <span className={styles.postTime}>
-                        {new Date(post.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={styles.postMenu}>⋯</div>
-                </div>
-
-                <div className={styles.postBody}>{post.content}</div>
-
-                <div className={styles.postReactions}>
-                  <span className={styles.reactionCount}>
-                    {post.reactionCount || 0} family members reacted
-                  </span>
-                  
-                  <span className={styles.commentCount}>0 comments</span>
-                </div>
-
-                <div className={styles.postDivider} />
-
-                <div className={styles.postActions}>
-                  <button
-                    type="button"
-                    className={styles.postActionBtn}
-                    onClick={() => handleToggleReaction(post.id)}
-                  >
-                    ❤️ {post.hasReacted ? 'Reacted' : 'React'}
-                  </button>
-                  <button className={styles.postActionBtn}>💬 Comment</button>
-
-                  <button className={styles.postActionBtn}>📤 Share</button>
-                </div>
-              </div>
-            )
-          })}
+          {posts.map(post => (
+            <PostCard
+              key={post.id}
+              post={post}
+              toggleReaction={handleToggleReaction}
+              commentInputs={commentInputs}
+              handleCommentChange={handleCommentChange}
+              handleCreateComment={handleCreateComment}
+              commentRefs={commentRefs}
+              focusCommentInput={focusCommentInput}
+            />
+          ))}
         </main>
 
         <aside className={styles.sidebarRight}>

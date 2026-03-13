@@ -7,7 +7,7 @@ const router = Router();
 /* CREATE POST */
 router.post("/", requireAuth, async (req: AuthRequest, res) => {
     try {
-        const { content } = req.body;
+        const { content, imageUrl } = req.body;
         const userId = req.user?.userId;
 
         if (!userId) {
@@ -21,6 +21,7 @@ router.post("/", requireAuth, async (req: AuthRequest, res) => {
         const post = await prisma.post.create({
             data: {
                 content: content.trim(),
+                imageUrl: imageUrl?.trim() || null,
                 authorUserId: userId,
             },
             include: {
@@ -61,12 +62,25 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
                         userId: true,
                     },
                 },
+                comments: {
+                    orderBy: { createdAt: "asc" },
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                fullName: true,
+                                email: true,
+                            },
+                        },
+                    },
+                },
             },
         });
 
         const formattedPosts = posts.map((post) => ({
             ...post,
             reactionCount: post.reactions.length,
+            commentCount: post.comments.length,
             hasReacted: post.reactions.some((reaction) => reaction.userId === userId),
         }));
 

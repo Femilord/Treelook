@@ -16,7 +16,7 @@ export async function getPosts() {
     return response.json();
 }
 
-export async function createPost(content) {
+export async function createPost(content, imageUrl = "") {
     const token = localStorage.getItem("treelook_token");
 
     const response = await fetch(`${API_BASE_URL}/posts`, {
@@ -25,7 +25,7 @@ export async function createPost(content) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, imageUrl }),
     });
 
     if (!response.ok) {

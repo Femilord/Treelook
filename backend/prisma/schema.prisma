@@ -28,6 +28,7 @@ model User {
 
   posts        Post[]
   reactions    Reaction[]
+  comments     Comment[]
 }
 
 model Post {
@@ -39,6 +40,7 @@ model Post {
 
   author       User       @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
   reactions    Reaction[]
+  comments     Comment[]
 }
 
 model Reaction {
@@ -52,4 +54,29 @@ model Reaction {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id           String     @id @default(uuid())
+  content      String
+  imageUrl     String?
+  authorUserId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  author       User       @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+  reactions    Reaction[]
+  comments     Comment[]
 }

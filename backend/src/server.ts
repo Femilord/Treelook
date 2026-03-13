@@ -4,6 +4,7 @@ import personsRouter from "./routes/persons";
 import authRouter from "./routes/auth";
 import postsRouter from "./routes/posts";
 import reactionsRouter from "./routes/reactions";
+import commentsRouter from "./routes/comments";
 
 const app = express();
 const PORT = 4000;
@@ -20,6 +21,7 @@ app.use("/persons", personsRouter);
 app.use("/auth", authRouter);
 app.use("/posts", postsRouter);
 app.use("/reactions", reactionsRouter);
+app.use("/comments", commentsRouter);
 
 app.listen(PORT, () => {
     console.log(`Treelook backend listening on http://localhost:${PORT}`);
